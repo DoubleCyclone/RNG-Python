@@ -2,9 +2,8 @@ import tkinter as tk
 import secrets
 import pygame
 
-
 # GUI Class
-class Rng_GUI :
+class RngGui :
     
     def __init__(self) :
         # root window
@@ -76,6 +75,10 @@ class Rng_GUI :
         # Pygame sound
         pygame.mixer.init()
         
+        # sound effects
+        self.dice_sound = pygame.mixer.Sound("resources/sfx/dice_roll.wav")
+        self.dice_sound.set_volume(0.1)
+        
         # Infinite loop for the window to stay open
         self.root.mainloop()
         
@@ -97,8 +100,8 @@ class Rng_GUI :
             
     def generate_single(self) :
         # get values from fields
-        start = int(self.var_btwn.get())
-        end = int(self.var_and.get())
+        start = int(self.var_btwn.get() or "0")
+        end = int(self.var_and.get() or "0")
         
         # Swap if min > max
         if start > end :
@@ -111,26 +114,30 @@ class Rng_GUI :
         self.var_output.set(output)
         
         # Play sound 
-        self.play_sound("resources/sfx/dice_roll.wav")
+        self.dice_sound.play()
         
         return output
     
     def generate_multiple(self) :
         # get values from fields
-        amount = max(1, int(self.var_amount.get()))
+        start = int(self.var_btwn.get() or "0")
+        end = int(self.var_and.get() or "0")
+        amount = int(self.var_amount.get() or "1")
+        
+        # Swap if min > max
+        if start > end :
+            start, end = end, start
+        
+        range_size = end - start + 1
         
         # prepare a list to store values
-        output_list = []
-        
-        # call generate method
-        for i in range(min(300, amount)) :
-            output_list.append(self.generate_single())
+        output_list = [start + secrets.randbelow(range_size) for _ in range(min(300, amount))]
         
         # fill the label field
         self.var_output.set(output_list)
         
-        # reset the list
-        output_list.clear()
+        # play sound 
+        self.dice_sound.play()
         
         # arrange wraplength based on window width
         self.lbl_output.configure(wraplength=self.root.winfo_width() - 30)
@@ -140,12 +147,7 @@ class Rng_GUI :
         
     def generate_multiple_hotkey(self, e) :
         self.generate_multiple()
-        
-    def play_sound(self, path) :
-        sound = pygame.mixer.Sound(path)
-        sound.play()
-        sound.set_volume(0.05)
-            
+                    
 if __name__ == '__main__' :
     # Call the class
-    Rng_GUI()
+    RngGui()
