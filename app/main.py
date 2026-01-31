@@ -10,7 +10,6 @@ class Rng_GUI :
         self.root.title("Random Number Generator by 8-Bit Hero")
         self.root.geometry("300x300")
         self.root.minsize(300, 300)
-        self.root.maxsize(300, 300)
         
         # frame to store labels, inputs and/or buttons
         self.frame_inputs = tk.Frame(self.root)
@@ -65,8 +64,12 @@ class Rng_GUI :
         self.btn_multiple.grid(row=0, column=1, padx=10, pady=8, sticky="WE")
         
         # Label
-        self.lbl_output = tk.Label(self.frame_output, textvariable=self.var_output, wraplength=270)
+        self.lbl_output = tk.Label(self.frame_output, textvariable=self.var_output)
         self.lbl_output.pack()
+        
+        # Hotkeys
+        self.root.bind("<Control-KeyPress-1>", self.generate_single_hotkey)
+        self.root.bind("<Control-KeyPress-2>", self.generate_multiple_hotkey)
         
         # Infinite loop for the window to stay open
         self.root.mainloop()
@@ -85,7 +88,7 @@ class Rng_GUI :
             if self.var_and.get().find("-", 1) >= 0 :
                 self.var_and.set(self.var_and.get()[0] + self.var_and.get()[1:].replace("-", ""))
         elif var == str(self.var_amount) :
-            self.var_amount.set(''.join([x for x in self.var_amount.get() if x in valid_inputs[1:]]))
+            self.var_amount.set(''.join([x for x in self.var_amount.get() if x in valid_inputs[2:]]))
             
     def generate_single(self) :
         # get values from fields
@@ -105,13 +108,13 @@ class Rng_GUI :
     
     def generate_multiple(self) :
         # get values from fields
-        amount = int(self.var_amount.get())
+        amount = max(1, int(self.var_amount.get()))
         
         # prepare a list to store values
         output_list = []
         
         # call generate method
-        for i in range(amount) :
+        for i in range(min(300, amount)) :
             output_list.append(self.generate_single())
         
         # fill the label field
@@ -119,7 +122,16 @@ class Rng_GUI :
         
         # reset the list
         output_list.clear()
+        
+        # arrange wraplength based on window width
+        self.lbl_output.configure(wraplength=self.root.winfo_width() - 30)
+        
+    def generate_single_hotkey(self, e) :
+        self.generate_single()
+        
+    def generate_multiple_hotkey(self, e) :
+        self.generate_multiple()
             
-            
-# Call the class
-Rng_GUI()
+if __name__ == '__main__' :
+    # Call the class
+    Rng_GUI()
