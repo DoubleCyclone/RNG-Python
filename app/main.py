@@ -1,4 +1,5 @@
 import tkinter as tk
+import secrets
 
 # GUI Class
 class Rng_GUI :
@@ -11,16 +12,26 @@ class Rng_GUI :
         self.root.minsize(300, 300)
         self.root.maxsize(300, 300)
         
-        # frame to store labels and inputs
+        # frame to store labels, inputs and/or buttons
         self.frame_inputs = tk.Frame(self.root)
         self.frame_inputs.pack(side="top", fill="both", expand=False)
         
         self.frame_inputs.columnconfigure(1, weight=1)
         
+        self.frame_buttons = tk.Frame(self.root)
+        self.frame_buttons.pack(side="top", fill="both", expand=False)
+        
+        self.frame_buttons.columnconfigure(0, weight=1)
+        self.frame_buttons.columnconfigure(1, weight=1)
+        
+        self.frame_output = tk.LabelFrame(self.root, text="Outputs")
+        self.frame_output.pack(padx=10, pady=5, fill="both", expand="yes")
+        
         # variables to store values
         self.var_btwn = tk.StringVar(self.root, value="1")
         self.var_and = tk.StringVar(self.root, value="2")
         self.var_amount = tk.StringVar(self.root, value="2")
+        self.var_output = tk.StringVar(self.root, value="")
         
         # track variables
         self.var_btwn.trace_add("write", self.write_number_field)
@@ -46,6 +57,17 @@ class Rng_GUI :
         self.entry_amount = tk.Entry(self.frame_inputs, textvariable=self.var_amount)
         self.entry_amount.grid(row=2, column=1, padx=10, pady=5, sticky="EW")
         
+        # Buttons
+        self.btn_single = tk.Button(self.frame_buttons, text="Roll Single", command=self.generate_single)
+        self.btn_single.grid(row=0, column=0, padx=10, pady=8, sticky="WE")
+        
+        self.btn_multiple = tk.Button(self.frame_buttons, text="Roll Multiple", command=self.generate_multiple)
+        self.btn_multiple.grid(row=0, column=1, padx=10, pady=8, sticky="WE")
+        
+        # Label
+        self.lbl_output = tk.Label(self.frame_output, textvariable=self.var_output, wraplength=270)
+        self.lbl_output.pack()
+        
         # Infinite loop for the window to stay open
         self.root.mainloop()
         
@@ -64,6 +86,39 @@ class Rng_GUI :
                 self.var_and.set(self.var_and.get()[0] + self.var_and.get()[1:].replace("-", ""))
         elif var == str(self.var_amount) :
             self.var_amount.set(''.join([x for x in self.var_amount.get() if x in valid_inputs[1:]]))
+            
+    def generate_single(self) :
+        # get values from fields
+        start = int(self.var_btwn.get())
+        end = int(self.var_and.get())
+        
+        # Swap if min > max
+        if start > end :
+            start, end = end, start
+        
+        range_size = end - start + 1
+        random_offset = secrets.randbelow(range_size)
+        output = start + random_offset
+        
+        self.var_output.set(output)
+        return output
+    
+    def generate_multiple(self) :
+        # get values from fields
+        amount = int(self.var_amount.get())
+        
+        # prepare a list to store values
+        output_list = []
+        
+        # call generate method
+        for i in range(amount) :
+            output_list.append(self.generate_single())
+        
+        # fill the label field
+        self.var_output.set(output_list)
+        
+        # reset the list
+        output_list.clear()
             
             
 # Call the class
