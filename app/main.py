@@ -4,12 +4,14 @@ import secrets
 import pygame
 from pynput import keyboard
 from config import ConfigHandler
+from cache import CacheHandler
 import os
+import json
         
 # GUI Class
 class RngGui(ctk.CTk) :
     
-    def __init__(self, config_handler) :
+    def __init__(self, config_handler, cache_handler) :
         super().__init__()
         
         # Config Handler
@@ -18,6 +20,12 @@ class RngGui(ctk.CTk) :
         # Config files
         self.cfg_style = self.config_handler.style_config
         self.cfg_hotkeys = self.config_handler.hotkeys_config
+        
+        # Cache Handler
+        self.cache_handler = cache_handler
+        
+        # Cache
+        self.cache = cache_handler.cache
         
         # root window
         self.title("Random Number Generator by 8-Bit Hero")
@@ -49,9 +57,9 @@ class RngGui(ctk.CTk) :
         self.frame_output.pack(padx=10, pady=5, fill="both", expand="yes")
         
         # variables to store values
-        self.var_btwn = ctk.StringVar(self, value="1")
-        self.var_and = ctk.StringVar(self, value="2")
-        self.var_amount = ctk.StringVar(self, value="2")
+        self.var_btwn = ctk.StringVar(self, value=self.cache["between"] or "1")
+        self.var_and = ctk.StringVar(self, value=self.cache["and"] or "2")
+        self.var_amount = ctk.StringVar(self, value=self.cache["amount"] or "2")
         self.var_output = ctk.StringVar(self, value="")
         
         # track variables
@@ -102,6 +110,9 @@ class RngGui(ctk.CTk) :
             self.cfg_hotkeys["roll_multiple"] or None : self.hotkey_multiple
             })
         self.hotkeys.start()
+        
+        # Override window destroy behavior
+        self.protocol('WM_DELETE_WINDOW', self.save)
         
     def write_number_field(self, var, index, mode) :
         # Valid inputs list
@@ -168,12 +179,27 @@ class RngGui(ctk.CTk) :
         
     def hotkey_multiple(self) :
         self.after(0, self.generate_multiple)
+        
+    def save(self) :
+        if os.path.exists(self.cache_handler.cache_path):
+            with open(self.cache_handler.cache_path, "r") as f:
+                cache = json.load(f)
+                cache["between"] = self.var_btwn.get() or "1"
+                cache["and"] = self.var_and.get() or "2"
+                cache["amount"] = self.var_amount.get() or "2"
+                
+        with open(self.cache_handler.cache_path, "w+") as f:
+            json.dump(cache, f, indent=4)
+        self.destroy()
     
                     
 if __name__ == '__main__' :
     # Call the Config Handler Class
     config_handler = ConfigHandler()
     
+    # Call the Cache Class
+    cache_handler = CacheHandler()
+    
     # Call the GUI class
-    gui = RngGui(config_handler=config_handler)
+    gui = RngGui(config_handler=config_handler, cache_handler=cache_handler)
     gui.mainloop()
