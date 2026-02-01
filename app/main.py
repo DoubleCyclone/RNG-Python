@@ -1,38 +1,58 @@
 import customtkinter as ctk
+import tkinter as tk
 import secrets
 import pygame
 from pynput import keyboard
+from config import ConfigHandler
+import os
         
 # GUI Class
-class RngGui :
+class RngGui(ctk.CTk) :
     
-    def __init__(self) :
+    def __init__(self, config_handler) :
+        super().__init__()
+        
+        # Config Handler
+        self.config_handler = config_handler
+        
+        # Config files
+        self.cfg_style = self.config_handler.style_config
+        self.cfg_hotkeys = self.config_handler.hotkeys_config
+        
         # root window
-        self.root = ctk.CTk()
-        self.root.title("Random Number Generator by 8-Bit Hero")
-        self.root.geometry("300x300")
-        self.root.minsize(300, 300)
+        self.title("Random Number Generator by 8-Bit Hero")
+        self.geometry("300x300")
+        self.minsize(300, 300)
+        
+        # Menubar
+        self.menubar = tk.Menu(self)
+        
+        self.menu_file = tk.Menu(self.menubar, tearoff=0)
+        
+        self.menubar.add_cascade(label="File", menu=self.menu_file)
+        
+        self.config(menu=self.menubar)
         
         # frame to store labels, inputs and/or buttons
-        self.frame_inputs = ctk.CTkFrame(self.root)
+        self.frame_inputs = ctk.CTkFrame(self)
         self.frame_inputs.pack(side="top", fill="both", expand=False)
         
         self.frame_inputs.columnconfigure(1, weight=1)
         
-        self.frame_buttons = ctk.CTkFrame(self.root)
+        self.frame_buttons = ctk.CTkFrame(self)
         self.frame_buttons.pack(side="top", fill="both", expand=False)
         
         self.frame_buttons.columnconfigure(0, weight=1)
         self.frame_buttons.columnconfigure(1, weight=1)
         
-        self.frame_output = ctk.CTkFrame(self.root)
+        self.frame_output = ctk.CTkFrame(self)
         self.frame_output.pack(padx=10, pady=5, fill="both", expand="yes")
         
         # variables to store values
-        self.var_btwn = ctk.StringVar(self.root, value="1")
-        self.var_and = ctk.StringVar(self.root, value="2")
-        self.var_amount = ctk.StringVar(self.root, value="2")
-        self.var_output = ctk.StringVar(self.root, value="")
+        self.var_btwn = ctk.StringVar(self, value="1")
+        self.var_and = ctk.StringVar(self, value="2")
+        self.var_amount = ctk.StringVar(self, value="2")
+        self.var_output = ctk.StringVar(self, value="")
         
         # track variables
         self.var_btwn.trace_add("write", self.write_number_field)
@@ -46,7 +66,7 @@ class RngGui :
         self.entry_btwn = ctk.CTkEntry(self.frame_inputs, textvariable=self.var_btwn)
         self.entry_btwn.grid(row=0, column=1, padx=10, pady=5, sticky="EW")
         
-        self.lbl_and = ctk.CTkLabel(self.frame_inputs, text="To")
+        self.lbl_and = ctk.CTkLabel(self.frame_inputs, text="And")
         self.lbl_and.grid(row=1, column=0, padx=10, pady=5, sticky="W")
         
         self.entry_and = ctk.CTkEntry(self.frame_inputs, textvariable=self.var_and)
@@ -78,13 +98,10 @@ class RngGui :
         
         # Hotkeys
         self.hotkeys = keyboard.GlobalHotKeys({
-            "<ctrl>+<alt>+1" : self.hotkey_single,
-            "<ctrl>+<alt>+2" : self.hotkey_multiple
+            self.cfg_hotkeys["roll_single"] or None : self.hotkey_single,
+            self.cfg_hotkeys["roll_multiple"] or None : self.hotkey_multiple
             })
         self.hotkeys.start()
-        
-        # Infinite loop for the window to stay open
-        self.root.mainloop()
         
     def write_number_field(self, var, index, mode) :
         # Valid inputs list
@@ -144,15 +161,19 @@ class RngGui :
         self.dice_sound.play()
         
         # arrange wraplength based on window width
-        self.lbl_output.configure(wraplength=self.root.winfo_width() - 30)
+        self.lbl_output.configure(wraplength=self.winfo_width() - 30)
         
     def hotkey_single(self) :
-        self.root.after(0, self.generate_single)
+        self.after(0, self.generate_single)
         
     def hotkey_multiple(self) :
-        self.root.after(0, self.generate_multiple)
+        self.after(0, self.generate_multiple)
     
                     
 if __name__ == '__main__' :
-    # Call the class
-    RngGui()
+    # Call the Config Handler Class
+    config_handler = ConfigHandler()
+    
+    # Call the GUI class
+    gui = RngGui(config_handler=config_handler)
+    gui.mainloop()
