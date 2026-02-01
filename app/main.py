@@ -1,4 +1,4 @@
-import tkinter as tk
+import customtkinter as ctk
 import secrets
 import pygame
 from pynput import keyboard
@@ -8,31 +8,31 @@ class RngGui :
     
     def __init__(self) :
         # root window
-        self.root = tk.Tk()
+        self.root = ctk.CTk()
         self.root.title("Random Number Generator by 8-Bit Hero")
         self.root.geometry("300x300")
         self.root.minsize(300, 300)
         
         # frame to store labels, inputs and/or buttons
-        self.frame_inputs = tk.Frame(self.root)
+        self.frame_inputs = ctk.CTkFrame(self.root)
         self.frame_inputs.pack(side="top", fill="both", expand=False)
         
         self.frame_inputs.columnconfigure(1, weight=1)
         
-        self.frame_buttons = tk.Frame(self.root)
+        self.frame_buttons = ctk.CTkFrame(self.root)
         self.frame_buttons.pack(side="top", fill="both", expand=False)
         
         self.frame_buttons.columnconfigure(0, weight=1)
         self.frame_buttons.columnconfigure(1, weight=1)
         
-        self.frame_output = tk.LabelFrame(self.root, text="Outputs")
+        self.frame_output = ctk.CTkFrame(self.root)
         self.frame_output.pack(padx=10, pady=5, fill="both", expand="yes")
         
         # variables to store values
-        self.var_btwn = tk.StringVar(self.root, value="1")
-        self.var_and = tk.StringVar(self.root, value="2")
-        self.var_amount = tk.StringVar(self.root, value="2")
-        self.var_output = tk.StringVar(self.root, value="")
+        self.var_btwn = ctk.StringVar(self.root, value="1")
+        self.var_and = ctk.StringVar(self.root, value="2")
+        self.var_amount = ctk.StringVar(self.root, value="2")
+        self.var_output = ctk.StringVar(self.root, value="")
         
         # track variables
         self.var_btwn.trace_add("write", self.write_number_field)
@@ -40,33 +40,33 @@ class RngGui :
         self.var_amount.trace_add("write", self.write_number_field)
         
         # between - and - amount labels and input fields
-        self.lbl_btwn = tk.Label(self.frame_inputs, text="Between")
+        self.lbl_btwn = ctk.CTkLabel(self.frame_inputs, text="Between")
         self.lbl_btwn.grid(row=0, column=0, padx=10, pady=5, sticky="W")
         
-        self.entry_btwn = tk.Entry(self.frame_inputs, textvariable=self.var_btwn)
+        self.entry_btwn = ctk.CTkEntry(self.frame_inputs, textvariable=self.var_btwn)
         self.entry_btwn.grid(row=0, column=1, padx=10, pady=5, sticky="EW")
         
-        self.lbl_and = tk.Label(self.frame_inputs, text="To")
+        self.lbl_and = ctk.CTkLabel(self.frame_inputs, text="To")
         self.lbl_and.grid(row=1, column=0, padx=10, pady=5, sticky="W")
         
-        self.entry_and = tk.Entry(self.frame_inputs, textvariable=self.var_and)
+        self.entry_and = ctk.CTkEntry(self.frame_inputs, textvariable=self.var_and)
         self.entry_and.grid(row=1, column=1, padx=10, pady=5, sticky="EW")
         
-        self.lbl_amount = tk.Label(self.frame_inputs, text="Amount")
+        self.lbl_amount = ctk.CTkLabel(self.frame_inputs, text="Amount")
         self.lbl_amount.grid(row=2, column=0, padx=10, pady=5, sticky="W")
         
-        self.entry_amount = tk.Entry(self.frame_inputs, textvariable=self.var_amount)
+        self.entry_amount = ctk.CTkEntry(self.frame_inputs, textvariable=self.var_amount)
         self.entry_amount.grid(row=2, column=1, padx=10, pady=5, sticky="EW")
         
         # Buttons
-        self.btn_single = tk.Button(self.frame_buttons, text="Roll Single", command=self.generate_single)
+        self.btn_single = ctk.CTkButton(self.frame_buttons, text="Roll Single", command=self.generate_single)
         self.btn_single.grid(row=0, column=0, padx=10, pady=8, sticky="WE")
         
-        self.btn_multiple = tk.Button(self.frame_buttons, text="Roll Multiple", command=self.generate_multiple)
+        self.btn_multiple = ctk.CTkButton(self.frame_buttons, text="Roll Multiple", command=self.generate_multiple)
         self.btn_multiple.grid(row=0, column=1, padx=10, pady=8, sticky="WE")
         
         # Label
-        self.lbl_output = tk.Label(self.frame_output, textvariable=self.var_output)
+        self.lbl_output = ctk.CTkLabel(self.frame_output, textvariable=self.var_output)
         self.lbl_output.pack()
                 
         # Pygame sound
