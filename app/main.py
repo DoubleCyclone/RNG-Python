@@ -1,7 +1,8 @@
 import tkinter as tk
 import secrets
 import pygame
-
+from pynput import keyboard
+        
 # GUI Class
 class RngGui :
     
@@ -67,17 +68,20 @@ class RngGui :
         # Label
         self.lbl_output = tk.Label(self.frame_output, textvariable=self.var_output)
         self.lbl_output.pack()
-        
-        # Hotkeys
-        self.root.bind("<Control-KeyPress-1>", self.generate_single_hotkey)
-        self.root.bind("<Control-KeyPress-2>", self.generate_multiple_hotkey)
-        
+                
         # Pygame sound
         pygame.mixer.init()
         
         # sound effects
         self.dice_sound = pygame.mixer.Sound("resources/sfx/dice_roll.wav")
         self.dice_sound.set_volume(0.1)
+        
+        # Hotkeys
+        self.hotkeys = keyboard.GlobalHotKeys({
+            "<ctrl>+<alt>+1" : self.hotkey_single,
+            "<ctrl>+<alt>+2" : self.hotkey_multiple
+            })
+        self.hotkeys.start()
         
         # Infinite loop for the window to stay open
         self.root.mainloop()
@@ -142,11 +146,12 @@ class RngGui :
         # arrange wraplength based on window width
         self.lbl_output.configure(wraplength=self.root.winfo_width() - 30)
         
-    def generate_single_hotkey(self, e) :
-        self.generate_single()
+    def hotkey_single(self) :
+        self.root.after(0, self.generate_single)
         
-    def generate_multiple_hotkey(self, e) :
-        self.generate_multiple()
+    def hotkey_multiple(self) :
+        self.root.after(0, self.generate_multiple)
+    
                     
 if __name__ == '__main__' :
     # Call the class
