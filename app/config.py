@@ -5,11 +5,17 @@ import os
 class ConfigHandler() :    
     
     def __init__(self) :
-        self.style_config_path = "config/style.json"
-        self.hotkeys_config_path = "config/hotkeys.json"
+        self.base_directory = "config/"
+        
+        self.style_config_path = self.base_directory + "style.json"
+        self.hotkeys_config_path = self.base_directory + "hotkeys.json"
         
         self.default_hotkeys_config = {"roll_single" : "<ctrl>+<alt>+1", "roll_multiple" : "<ctrl>+<alt>+2"}
         self.default_style_config = {}
+        
+        # Create base dir if does not exist
+        if not os.path.exists(self.base_directory):
+            os.mkdir(self.base_directory)
         
         # Layout config
         if os.path.exists(self.style_config_path):
