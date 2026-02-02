@@ -1,31 +1,34 @@
 import customtkinter as ctk
 import tkinter as tk
 import secrets
-import pygame
 from pynput import keyboard
-from config import ConfigHandler
-from cache import CacheHandler
+from config_handler import ConfigHandler
+from cache_handler import CacheHandler
+from sound_player import SoundPlayer
 import os
 import json
         
 # GUI Class
 class RngGui(ctk.CTk) :
     
-    def __init__(self, config_handler, cache_handler) :
+    def __init__(self, config_handler, cache_handler, sound_player) :
         super().__init__()
         
         # Config Handler
-        self.config_handler = config_handler
+        self.config_handler : ConfigHandler = config_handler
         
         # Config files
         self.cfg_style = self.config_handler.style_config
         self.cfg_hotkeys = self.config_handler.hotkeys_config
         
         # Cache Handler
-        self.cache_handler = cache_handler
+        self.cache_handler : CacheHandler = cache_handler
         
         # Cache
         self.cache = cache_handler.cache
+        
+        # Sound Player
+        self.sound_player : SoundPlayer = sound_player
         
         # root window
         self.title("Random Number Generator by 8-Bit Hero")
@@ -96,13 +99,6 @@ class RngGui(ctk.CTk) :
         # Label
         self.lbl_output = ctk.CTkLabel(self.frame_output, textvariable=self.var_output)
         self.lbl_output.pack()
-                
-        # Pygame sound
-        pygame.mixer.init()
-        
-        # sound effects
-        self.dice_sound = pygame.mixer.Sound("resources/sfx/dice_roll.wav")
-        self.dice_sound.set_volume(0.1)
         
         # Hotkeys
         self.hotkeys = keyboard.GlobalHotKeys({
@@ -146,7 +142,7 @@ class RngGui(ctk.CTk) :
         self.var_output.set(output)
         
         # Play sound 
-        self.dice_sound.play()
+        self.sound_player.play_sound("roll_single")
         
         return output
     
@@ -169,7 +165,7 @@ class RngGui(ctk.CTk) :
         self.var_output.set(output_list)
         
         # play sound 
-        self.dice_sound.play()
+        self.sound_player.play_sound("roll_multiple")
         
         # arrange wraplength based on window width
         self.lbl_output.configure(wraplength=self.winfo_width() - 30)
@@ -200,6 +196,9 @@ if __name__ == '__main__' :
     # Call the Cache Class
     cache_handler = CacheHandler()
     
+    # Call the Sound Player Class
+    sound_player = SoundPlayer(config_handler=config_handler)
+    
     # Call the GUI class
-    gui = RngGui(config_handler=config_handler, cache_handler=cache_handler)
+    gui = RngGui(config_handler=config_handler, cache_handler=cache_handler, sound_player=sound_player)
     gui.mainloop()
