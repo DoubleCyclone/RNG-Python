@@ -16,14 +16,12 @@ class RngGui(ctk.CTk) :
         
         # Config Handler
         self.config_handler : ConfigHandler = config_handler
-        
         # Config files
         self.cfg_style = self.config_handler.style_config
         self.cfg_hotkeys = self.config_handler.hotkeys_config
         
         # Cache Handler
         self.cache_handler : CacheHandler = cache_handler
-        
         # Cache
         self.cache = cache_handler.cache
         
@@ -47,12 +45,10 @@ class RngGui(ctk.CTk) :
         # frame to store labels, inputs and/or buttons
         self.frame_inputs = ctk.CTkFrame(self)
         self.frame_inputs.pack(side="top", fill="both", expand=False)
-        
         self.frame_inputs.columnconfigure(1, weight=1)
         
         self.frame_buttons = ctk.CTkFrame(self)
         self.frame_buttons.pack(side="top", fill="both", expand=False)
-        
         self.frame_buttons.columnconfigure(0, weight=1)
         self.frame_buttons.columnconfigure(1, weight=1)
         
@@ -70,7 +66,7 @@ class RngGui(ctk.CTk) :
         self.var_and.trace_add("write", self.write_number_field)
         self.var_amount.trace_add("write", self.write_number_field)
         
-        # between - and - amount labels and input fields
+        # Labels and input fields
         self.lbl_btwn = ctk.CTkLabel(self.frame_inputs, text="Between")
         self.lbl_btwn.grid(row=0, column=0, padx=10, pady=5, sticky="W")
         
@@ -106,6 +102,9 @@ class RngGui(ctk.CTk) :
             self.cfg_hotkeys["roll_multiple"] or None : self.hotkey_multiple
             })
         self.hotkeys.start()
+        
+        # Style
+        self.stylize(config_handler=config_handler)
         
         # Override window destroy behavior
         self.protocol('WM_DELETE_WINDOW', self.save)
@@ -161,8 +160,11 @@ class RngGui(ctk.CTk) :
         # prepare a list to store values
         output_list = [start + secrets.randbelow(range_size) for _ in range(min(300, amount))]
         
+        # Add a space after every element
+        formatted_list = "  ".join(str(num) for num in output_list)
+        
         # fill the label field
-        self.var_output.set(output_list)
+        self.var_output.set(formatted_list)
         
         # play sound 
         self.sound_player.play_sound("roll_multiple")
@@ -187,6 +189,30 @@ class RngGui(ctk.CTk) :
         with open(self.cache_handler.cache_path, "w+") as f:
             json.dump(cache, f, indent=4)
         self.destroy()
+        
+    def stylize(self, config_handler : ConfigHandler) :
+        # create font
+        self.label_font = ctk.CTkFont(family=config_handler.style_config["label_font_family"], size=config_handler.style_config["label_font_size"], weight=config_handler.style_config["label_font_weight"])
+        self.entry_font = ctk.CTkFont(family=config_handler.style_config["entry_font_family"], size=config_handler.style_config["entry_font_size"], weight=config_handler.style_config["entry_font_weight"])
+        self.button_font = ctk.CTkFont(family=config_handler.style_config["button_font_family"], size=config_handler.style_config["button_font_size"], weight=config_handler.style_config["button_font_weight"])
+        self.output_font = ctk.CTkFont(family=config_handler.style_config["output_font_family"], size=config_handler.style_config["output_font_size"], weight=config_handler.style_config["output_font_weight"])
+        
+        # Label Styling
+        self.lbl_btwn.configure(font=self.label_font)
+        self.lbl_and.configure(font=self.label_font)
+        self.lbl_amount.configure(font=self.label_font)
+        
+        # Entry Styling
+        self.entry_btwn.configure(font=self.entry_font)
+        self.entry_and.configure(font=self.entry_font)
+        self.entry_amount.configure(font=self.entry_font)
+        
+        # Button Styling
+        self.btn_single.configure(font=self.button_font, fg_color=config_handler.style_config["button_foreground_color"], hover_color=config_handler.style_config["button_hover_color"])
+        self.btn_multiple.configure(font=self.button_font, fg_color=config_handler.style_config["button_foreground_color"], hover_color=config_handler.style_config["button_hover_color"])
+        
+        # Output Styling
+        self.lbl_output.configure(font=self.output_font)
     
                     
 if __name__ == '__main__' :

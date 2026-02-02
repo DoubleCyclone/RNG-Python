@@ -12,14 +12,18 @@ class ConfigHandler() :
         self.sfx_config_path = self.base_directory + "sfx.json"
         
         self.default_hotkeys_config = {"roll_single" : "<ctrl>+<alt>+1", "roll_multiple" : "<ctrl>+<alt>+2"}
-        self.default_style_config = {}
+        self.default_style_config = {
+            "label_font_family" : "Roboto", "label_font_size" : 16, "label_font_weight" : "normal", "entry_font_family" : "Roboto", "entry_font_size" : 14,
+            "entry_font_weight" : "normal", "button_font_family" : "Roboto",  "button_font_size" : 16, "button_font_weight" : "bold", "button_foreground_color" : "#663399",
+            "button_hover_color" : "#4E2775", "output_font_family" : "Roboto",  "output_font_size" : 64, "output_font_weight" : "normal"
+        }
         self.default_sfx_config = {"roll_single" : "resources/sfx/dice_roll.wav", "roll_multiple" : "resources/sfx/dice_roll.wav"}
         
         # Create base dir if does not exist
         if not os.path.exists(self.base_directory):
             os.mkdir(self.base_directory)
         
-        # Layout config
+        # Style config
         if os.path.exists(self.style_config_path):
             with open(self.style_config_path) as f:
                 self.style_config = json.load(f)
