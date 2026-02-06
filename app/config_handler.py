@@ -11,7 +11,18 @@ class ConfigHandler() :
         self.hotkeys_config_path = self.base_directory + "hotkeys.json"
         self.sfx_config_path = self.base_directory + "sfx.json"
         
-        self.default_hotkeys_config = {"roll_single" : "<ctrl>+<alt>+1", "roll_multiple" : "<ctrl>+<alt>+2"}
+        self.default_hotkeys_config = {
+            "roll_single": "<ctrl>+<alt>+1",
+            "roll_multiple": "<ctrl>+<alt>+2",
+            "roll_d2": "<alt>+2",
+            "roll_d3": "<alt>+3",
+            "roll_d4": "<alt>+4",
+            "roll_d5": "<alt>+5",
+            "roll_d6": "<alt>+6",
+            "roll_d7": "<alt>+7",
+            "roll_d8": "<alt>+8",
+            "roll_d9": "<alt>+9"
+        }
         self.default_style_config = {
             "label_font_family" : "Roboto", "label_font_size" : 16, "label_font_weight" : "normal", "entry_font_family" : "Roboto", "entry_font_size" : 14,
             "entry_font_weight" : "normal", "button_font_family" : "Roboto",  "button_font_size" : 16, "button_font_weight" : "bold", "button_foreground_color" : "#663399",

@@ -99,7 +99,15 @@ class RngGui(ctk.CTk) :
         # Hotkeys
         self.hotkeys = keyboard.GlobalHotKeys({
             self.cfg_hotkeys["roll_single"] or None : self.hotkey_single,
-            self.cfg_hotkeys["roll_multiple"] or None : self.hotkey_multiple
+            self.cfg_hotkeys["roll_multiple"] or None : self.hotkey_multiple,
+            self.cfg_hotkeys["roll_d2"] or None : lambda : self.roll_predetermined(2),
+            self.cfg_hotkeys["roll_d3"] or None : lambda : self.roll_predetermined(3),
+            self.cfg_hotkeys["roll_d4"] or None : lambda : self.roll_predetermined(4),
+            self.cfg_hotkeys["roll_d5"] or None : lambda : self.roll_predetermined(5),
+            self.cfg_hotkeys["roll_d6"] or None : lambda : self.roll_predetermined(6),
+            self.cfg_hotkeys["roll_d7"] or None : lambda : self.roll_predetermined(7),
+            self.cfg_hotkeys["roll_d8"] or None : lambda : self.roll_predetermined(8),
+            self.cfg_hotkeys["roll_d9"] or None : lambda : self.roll_predetermined(9)
             })
         self.hotkeys.start()
         
@@ -171,6 +179,13 @@ class RngGui(ctk.CTk) :
         
         # arrange wraplength based on window width
         self.lbl_output.configure(wraplength=self.winfo_width() - 30)
+        
+    def roll_predetermined(self, max) :
+        random = secrets.randbelow(max) + 1
+        self.var_output.set(random)
+        
+        # Play sound 
+        self.sound_player.play_sound("roll_single")
         
     def hotkey_single(self) :
         self.after(0, self.generate_single)
