@@ -12,8 +12,8 @@ class ConfigHandler() :
         self.sfx_config_path = self.base_directory + "sfx.json"
         
         self.default_hotkeys_config = {
-            "roll_single": "<ctrl>+<alt>+1",
-            "roll_multiple": "<ctrl>+<alt>+2",
+            "roll_single": "<alt>+q",
+            "roll_multiple": "<alt>+w",
             "roll_d2": "<alt>+2",
             "roll_d3": "<alt>+3",
             "roll_d4": "<alt>+4",

@@ -181,8 +181,11 @@ class RngGui(ctk.CTk) :
         self.lbl_output.configure(wraplength=self.winfo_width() - 30)
         
     def roll_predetermined(self, max) :
+        # Roll
         random = secrets.randbelow(max) + 1
-        self.var_output.set(random)
+        
+        # Update the output
+        self.var_output.set(f"{random} (D{max})")
         
         # Play sound 
         self.sound_player.play_sound("roll_single")
