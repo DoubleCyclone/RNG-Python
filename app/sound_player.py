@@ -4,6 +4,9 @@ import pygame
 class SoundPlayer :
     
     def __init__(self, config_handler):
+        self.config_handler = config_handler
+        self.sound_enabled = config_handler.sound_config["sound_enabled"]
+        
         # Base Dir
         self.base_directory = "resources/sfx/"
         
@@ -13,8 +16,8 @@ class SoundPlayer :
             
         # Get paths from the config
         self.sound_paths = {}
-        self.sound_paths["roll_single"] = config_handler.sfx_config["roll_single"] if os.path.exists(config_handler.sfx_config["roll_single"]) else ""
-        self.sound_paths["roll_multiple"] = config_handler.sfx_config["roll_multiple"] if os.path.exists(config_handler.sfx_config["roll_multiple"]) else ""
+        self.sound_paths["roll_single"] = self.config_handler.sfx_config["roll_single"] if os.path.exists(self.config_handler.sfx_config["roll_single"]) else ""
+        self.sound_paths["roll_multiple"] = self.config_handler.sfx_config["roll_multiple"] if os.path.exists(self.config_handler.sfx_config["roll_multiple"]) else ""
         
         # Initialize pygame mixer
         pygame.mixer.init()
@@ -26,6 +29,8 @@ class SoundPlayer :
         self.sounds["roll_multiple"] = self.retrieve_sound("roll_multiple", 0.1)
 
     def play_sound(self, sound_name):
+        if not self.sound_enabled:
+            return
         if not self.sounds[sound_name]:
             return
         self.sounds[sound_name].play()
@@ -39,3 +44,7 @@ class SoundPlayer :
         self.sounds[sound_name].set_volume(volume)
         
         return self.sounds[sound_name]
+    
+    def enable_disable_sound(self):
+        self.sound_enabled = not self.sound_enabled
+        self.config_handler.sound_config["sound_enabled"] = self.sound_enabled

@@ -3,15 +3,12 @@ import tkinter as tk
 import secrets
 from pynput import keyboard
 from config_handler import ConfigHandler
-from cache_handler import CacheHandler
 from sound_player import SoundPlayer
-import os
-import json
         
 # GUI Class
 class RngGui(ctk.CTk) :
     
-    def __init__(self, config_handler, cache_handler, sound_player) :
+    def __init__(self, config_handler, sound_player) :
         super().__init__()
         
         # Config Handler
@@ -19,11 +16,7 @@ class RngGui(ctk.CTk) :
         # Config files
         self.cfg_style = self.config_handler.style_config
         self.cfg_hotkeys = self.config_handler.hotkeys_config
-        
-        # Cache Handler
-        self.cache_handler : CacheHandler = cache_handler
-        # Cache
-        self.cache = cache_handler.cache
+        self.cfg_preset = self.config_handler.preset_config
         
         # Sound Player
         self.sound_player : SoundPlayer = sound_player
@@ -36,9 +29,10 @@ class RngGui(ctk.CTk) :
         # Menubar
         self.menubar = tk.Menu(self)
         
-        self.menu_file = tk.Menu(self.menubar, tearoff=0)
+        self.menu_sound = tk.Menu(self.menubar, tearoff=False)
+        self.menu_sound.add_command(label='Enable/Disable Sound', command=self.sound_player.enable_disable_sound)
         
-        self.menubar.add_cascade(label="File", menu=self.menu_file)
+        self.menubar.add_cascade(label="Sound", menu=self.menu_sound)
         
         self.config(menu=self.menubar)
         
@@ -56,9 +50,9 @@ class RngGui(ctk.CTk) :
         self.frame_output.pack(padx=10, pady=5, fill="both", expand="yes")
         
         # variables to store values
-        self.var_btwn = ctk.StringVar(self, value=self.cache["between"] or "1")
-        self.var_and = ctk.StringVar(self, value=self.cache["and"] or "2")
-        self.var_amount = ctk.StringVar(self, value=self.cache["amount"] or "2")
+        self.var_btwn = ctk.StringVar(self, value=self.cfg_preset["min"] or "1")
+        self.var_and = ctk.StringVar(self, value=self.cfg_preset["max"] or "2")
+        self.var_amount = ctk.StringVar(self, value=self.cfg_preset["amount"] or "2")
         self.var_output = ctk.StringVar(self, value="")
         
         # track variables
@@ -67,13 +61,13 @@ class RngGui(ctk.CTk) :
         self.var_amount.trace_add("write", self.write_number_field)
         
         # Labels and input fields
-        self.lbl_btwn = ctk.CTkLabel(self.frame_inputs, text="Between")
+        self.lbl_btwn = ctk.CTkLabel(self.frame_inputs, text="Min")
         self.lbl_btwn.grid(row=0, column=0, padx=10, pady=5, sticky="W")
         
         self.entry_btwn = ctk.CTkEntry(self.frame_inputs, textvariable=self.var_btwn)
         self.entry_btwn.grid(row=0, column=1, padx=10, pady=5, sticky="EW")
         
-        self.lbl_and = ctk.CTkLabel(self.frame_inputs, text="And")
+        self.lbl_and = ctk.CTkLabel(self.frame_inputs, text="Max")
         self.lbl_and.grid(row=1, column=0, padx=10, pady=5, sticky="W")
         
         self.entry_and = ctk.CTkEntry(self.frame_inputs, textvariable=self.var_and)
@@ -132,6 +126,11 @@ class RngGui(ctk.CTk) :
                 self.var_and.set(self.var_and.get()[0] + self.var_and.get()[1:].replace("-", ""))
         elif var == str(self.var_amount) :
             self.var_amount.set(''.join([x for x in self.var_amount.get() if x in valid_inputs[2:]]))
+            
+        # Save
+        self.config_handler.preset_config["min"] = self.var_btwn.get()
+        self.config_handler.preset_config["max"] = self.var_and.get()
+        self.config_handler.preset_config["amount"] = self.var_amount.get()
             
     def generate_single(self) :
         # get values from fields
@@ -197,15 +196,7 @@ class RngGui(ctk.CTk) :
         self.after(0, self.generate_multiple)
         
     def save(self) :
-        if os.path.exists(self.cache_handler.cache_path):
-            with open(self.cache_handler.cache_path, "r") as f:
-                cache = json.load(f)
-                cache["between"] = self.var_btwn.get() or "1"
-                cache["and"] = self.var_and.get() or "2"
-                cache["amount"] = self.var_amount.get() or "2"
-                
-        with open(self.cache_handler.cache_path, "w+") as f:
-            json.dump(cache, f, indent=4)
+        self.config_handler.save_configs()
         self.destroy()
         
     def stylize(self, config_handler : ConfigHandler) :
@@ -237,12 +228,9 @@ if __name__ == '__main__' :
     # Call the Config Handler Class
     config_handler = ConfigHandler()
     
-    # Call the Cache Class
-    cache_handler = CacheHandler()
-    
     # Call the Sound Player Class
     sound_player = SoundPlayer(config_handler=config_handler)
     
     # Call the GUI class
-    gui = RngGui(config_handler=config_handler, cache_handler=cache_handler, sound_player=sound_player)
+    gui = RngGui(config_handler=config_handler, sound_player=sound_player)
     gui.mainloop()
