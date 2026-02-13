@@ -32,7 +32,7 @@ class ConfigHandler() :
             "button_hover_color" : "#4E2775", "output_font_family" : "Roboto",  "output_font_size" : 64, "output_font_weight" : "normal"
         }
         self.default_sfx_config = {"roll_single" : "resources/sfx/dice_roll.wav", "roll_multiple" : "resources/sfx/dice_roll.wav"}
-        self.default_sound_config = {"sound_enabled" : True}
+        self.default_sound_config = {"sound_enabled" : True, "tts_enabled" : True}
         
         # Create base dir if does not exist
         if not os.path.exists(self.base_directory):

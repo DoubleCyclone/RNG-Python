@@ -1,11 +1,13 @@
 import os
 import pygame
+from gtts import gTTS
 
 class SoundPlayer :
     
     def __init__(self, config_handler):
         self.config_handler = config_handler
         self.sound_enabled = config_handler.sound_config["sound_enabled"]
+        self.tts_enabled = config_handler.sound_config["tts_enabled"]
         
         # Base Dir
         self.base_directory = "resources/sfx/"
@@ -48,3 +50,18 @@ class SoundPlayer :
     def enable_disable_sound(self):
         self.sound_enabled = not self.sound_enabled
         self.config_handler.sound_config["sound_enabled"] = self.sound_enabled
+        
+    def enable_disable_tts(self):
+        self.tts_enabled = not self.tts_enabled
+        self.config_handler.sound_config["tts_enabled"] = self.tts_enabled    
+    
+    def play_external_sound(self, generated):
+        if not self.tts_enabled:
+            return
+        tts_path = f"{generated}.mp3"
+        tts = gTTS(f"{generated}")
+        tts.save(tts_path)
+        self.sounds["latest_tts"] = pygame.mixer.Sound(tts_path)
+        self.sounds["latest_tts"].set_volume(0.1)
+        self.sounds["latest_tts"].play()
+        os.remove(tts_path)

@@ -31,6 +31,7 @@ class RngGui(ctk.CTk) :
         
         self.menu_sound = tk.Menu(self.menubar, tearoff=False)
         self.menu_sound.add_command(label='Enable/Disable Sound', command=self.sound_player.enable_disable_sound)
+        self.menu_sound.add_command(label="Enable/Disable TTS", command=self.sound_player.enable_disable_tts)
         
         self.menubar.add_cascade(label="Sound", menu=self.menu_sound)
         
@@ -150,6 +151,9 @@ class RngGui(ctk.CTk) :
         # Play sound 
         self.sound_player.play_sound("roll_single")
         
+        # Play tts
+        self.sound_player.play_external_sound(output)
+        
         return output
     
     def generate_multiple(self) :
@@ -189,6 +193,9 @@ class RngGui(ctk.CTk) :
         # Play sound 
         self.sound_player.play_sound("roll_single")
         
+        # Create and play TTS
+        self.sound_player.play_external_sound(random)
+        
     def hotkey_single(self) :
         self.after(0, self.generate_single)
         
@@ -222,7 +229,6 @@ class RngGui(ctk.CTk) :
         
         # Output Styling
         self.lbl_output.configure(font=self.output_font)
-    
                     
 if __name__ == '__main__' :
     # Call the Config Handler Class
