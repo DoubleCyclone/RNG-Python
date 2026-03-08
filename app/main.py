@@ -13,7 +13,8 @@ class RngGui(ctk.CTk) :
         
         # Config Handler
         self.config_handler : ConfigHandler = config_handler
-        # Config files
+        
+        # Config Files
         self.cfg_style = self.config_handler.style_config
         self.cfg_hotkeys = self.config_handler.hotkeys_config
         self.cfg_preset = self.config_handler.preset_config
@@ -21,10 +22,10 @@ class RngGui(ctk.CTk) :
         # Sound Player
         self.sound_player : SoundPlayer = sound_player
         
-        # root window
+        # Root Window
         self.title("Random Number Generator by 8-Bit Hero")
-        self.geometry("300x300")
-        self.minsize(300, 300)
+        self.geometry("300x340")
+        self.minsize(300, 340)
         
         # Menubar
         self.menubar = tk.Menu(self)
@@ -47,7 +48,7 @@ class RngGui(ctk.CTk) :
         self.frame_buttons.columnconfigure(0, weight=1)
         self.frame_buttons.columnconfigure(1, weight=1)
         
-        self.frame_output = ctk.CTkFrame(self)
+        self.frame_output = ctk.CTkScrollableFrame(self)
         self.frame_output.pack(padx=10, pady=5, fill="both", expand="yes")
         
         # variables to store values
@@ -88,13 +89,14 @@ class RngGui(ctk.CTk) :
         self.btn_multiple.grid(row=0, column=1, padx=10, pady=8, sticky="WE")
         
         # Label
-        self.lbl_output = ctk.CTkLabel(self.frame_output, textvariable=self.var_output)
+        self.lbl_output = ctk.CTkLabel(self.frame_output, textvariable=self.var_output, anchor=ctk.N)
         self.lbl_output.pack()
         
         # Hotkeys
         self.hotkeys = keyboard.GlobalHotKeys({
             self.cfg_hotkeys["roll_single"] or None : self.hotkey_single,
             self.cfg_hotkeys["roll_multiple"] or None : self.hotkey_multiple,
+            self.cfg_hotkeys["roll_d10"] or None : lambda : self.roll_predetermined(10),
             self.cfg_hotkeys["roll_d2"] or None : lambda : self.roll_predetermined(2),
             self.cfg_hotkeys["roll_d3"] or None : lambda : self.roll_predetermined(3),
             self.cfg_hotkeys["roll_d4"] or None : lambda : self.roll_predetermined(4),
