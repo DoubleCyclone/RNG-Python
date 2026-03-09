@@ -30,7 +30,7 @@ jobs:
         run: >
           pyinstaller
           --noconfirm
-          --onedir
+          --onefile
           --windowed
           --name "RngApp"
           --add-data "resources/sfx/roll_single.wav;resources/sfx"
@@ -39,7 +39,7 @@ jobs:
 
       # Zip the output folder so it can be attached to the release as one file
       - name: Zip build output
-        run: Compress-Archive -Path dist/RngApp/* -DestinationPath RngApp.zip
+        run: Compress-Archive -Path dist/RngApp.exe -DestinationPath RngApp.zip
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
