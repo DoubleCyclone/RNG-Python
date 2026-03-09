@@ -210,3 +210,4 @@ __marimo__/
 rng
 cache/*.json
 config/*.json
+output

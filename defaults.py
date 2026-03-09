@@ -32,8 +32,8 @@ STYLE = {
 }
 
 SFX = {
-    "roll_single": "resources/sfx/dice_roll.wav",
-    "roll_multiple": "resources/sfx/dice_roll.wav",
+    "roll_single": "resources/sfx/roll_single.wav",
+    "roll_multiple": "resources/sfx/roll_multiple.wav",
 }
 
 SOUND = {"sound_enabled": True, "tts_enabled": True}

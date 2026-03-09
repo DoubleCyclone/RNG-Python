@@ -1,19 +1,20 @@
 import json
 import os
 from defaults import *
+from utils import app_data_path
 
 # Config Handler Class
 class ConfigHandler() :    
     
     def __init__(self) :
-        self.base_directory = "config/"
+        self.base_directory = app_data_path("config")
         
         # Initialize config paths
-        self.preset_config_path = self.base_directory + "preset.json"
-        self.style_config_path = self.base_directory + "style.json"
-        self.hotkeys_config_path = self.base_directory + "hotkeys.json"
-        self.sfx_config_path = self.base_directory + "sfx.json"
-        self.sound_config_path = self.base_directory + "sound.json"
+        self.preset_config_path = os.path.join(self.base_directory, "preset.json")
+        self.style_config_path = os.path.join(self.base_directory, "style.json")
+        self.hotkeys_config_path = os.path.join(self.base_directory, "hotkeys.json")
+        self.sfx_config_path = os.path.join(self.base_directory, "sfx.json")
+        self.sound_config_path = os.path.join(self.base_directory, "sound.json")
         
         # Get default configs
         self.default_preset_config = PRESET
@@ -24,7 +25,7 @@ class ConfigHandler() :
         
         # Create base dir if does not exist
         if not os.path.exists(self.base_directory):
-            os.mkdir(self.base_directory)
+            os.makedirs(self.base_directory)
         
         # Preset config
         self.preset_config = self.check_saved_config(self.preset_config_path, self.default_preset_config)
@@ -61,6 +62,3 @@ class ConfigHandler() :
         for config, path in self.configs :
             with open(path, "w+") as f:
                 json.dump(config, f, indent=4)
-        
-            
-        

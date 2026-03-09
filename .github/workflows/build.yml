@@ -1,0 +1,53 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install pyinstaller
+          pip install -r requirements.txt
+
+      - name: Build executable with PyInstaller
+        run: >
+          pyinstaller
+          --noconfirm
+          --onedir
+          --windowed
+          --name "RngApp"
+          --add-data "resources/sfx/roll_single.wav;resources/sfx"
+          --add-data "resources/sfx/roll_multiple.wav;resources/sfx"
+          main.py
+
+      # Zip the output folder so it can be attached to the release as one file
+      - name: Zip build output
+        run: Compress-Archive -Path dist/RngApp/* -DestinationPath RngApp.zip
+
+      - name: Get short commit SHA for release tag
+        id: vars
+        run: echo "sha=$(git rev-parse --short HEAD)" >> $env:GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ steps.vars.outputs.sha }}
+          name: "Build ${{ steps.vars.outputs.sha }}"
+          body: "Automated build from commit ${{ steps.vars.outputs.sha }}"
+          files: RngApp.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
