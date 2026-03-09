@@ -208,6 +208,3 @@ __marimo__/
 
 # Venv
 rng
-cache/*.json
-config/*.json
-output
