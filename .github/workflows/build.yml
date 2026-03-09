@@ -41,16 +41,12 @@ jobs:
       - name: Zip build output
         run: Compress-Archive -Path dist/RngApp/* -DestinationPath RngApp.zip
 
-      - name: Get short commit SHA for release tag
-        id: vars
-        run: echo "sha=$(git rev-parse --short HEAD)" >> $env:GITHUB_OUTPUT
-
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: build-${{ steps.vars.outputs.sha }}
-          name: "Build ${{ steps.vars.outputs.sha }}"
-          body: "Automated build from commit ${{ steps.vars.outputs.sha }}"
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          body: "Automated build from ${{ github.ref_name }}"
           files: RngApp.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
