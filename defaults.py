@@ -37,3 +37,5 @@ SFX = {
 }
 
 SOUND = {"sound_enabled": True, "tts_enabled": True}
+
+HISTORY_HEADERS = ['Numbers', 'Min', 'Max', 'Time - Date']

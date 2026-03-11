@@ -4,11 +4,12 @@ import secrets
 from pynput import keyboard
 from config_handler import ConfigHandler
 from sound_player import SoundPlayer
+from history_handler import HistoryHandler
         
 # GUI Class
 class RngGui(ctk.CTk) :
     
-    def __init__(self, config_handler, sound_player) :
+    def __init__(self, config_handler, sound_player, history_handler) :
         super().__init__()
         
         # Config Handler
@@ -22,40 +23,74 @@ class RngGui(ctk.CTk) :
         # Sound Player
         self.sound_player : SoundPlayer = sound_player
         
+        # History Handler
+        self.history_handler : HistoryHandler = history_handler
+        
+        self.min_width = 300
+        self.min_height = 340
+        self.calc_width = self.min_width + self.min_width * self.cfg_preset["history"]
+        
+        # Full Container
+        self.frame_container = ctk.CTkFrame(self, width=self.min_width, height=self.min_height)
+        self.frame_container.pack(side="top", fill="both", expand=True)
+        
+        # Main Frame
+        self.frame_main = ctk.CTkFrame(self.frame_container, width=self.min_width, height=self.min_height)
+        self.frame_main.pack(side="left", fill="both", expand=True)
+        
+        # History Frame
+        self.frame_history = ctk.CTkFrame(self.frame_container, width=self.min_width)
+        self.frame_history.pack(side="left", fill="both", expand=True)
+        
         # Root Window
         self.title("Random Number Generator by 8-Bit Hero")
-        self.geometry("300x340")
-        self.minsize(300, 340)
+        self.geometry(f"{self.calc_width}x{self.min_height}")
+        self.minsize(self.min_width, self.min_height)
         
         # Menubar
         self.menubar = tk.Menu(self)
         
+        # Sound Menu
         self.menu_sound = tk.Menu(self.menubar, tearoff=False)
         self.menu_sound.add_command(label='Enable/Disable Sound', command=self.sound_player.enable_disable_sound)
         self.menu_sound.add_command(label="Enable/Disable TTS", command=self.sound_player.enable_disable_tts)
         
         self.menubar.add_cascade(label="Sound", menu=self.menu_sound)
         
+        # History Menu
+        self.menu_history = tk.Menu(self.menubar, tearoff=False)
+        self.menu_history.add_command(label="Enable/Disable History Tab", command=self.enable_disable_history_tab)
+        
+        self.menubar.add_cascade(label="History", menu=self.menu_history)
+        
         self.config(menu=self.menubar)
         
-        # frame to store labels, inputs and/or buttons
-        self.frame_inputs = ctk.CTkFrame(self)
+        # Main Frame Contents
+        self.frame_inputs = ctk.CTkFrame(self.frame_main)
         self.frame_inputs.pack(side="top", fill="both", expand=False)
         self.frame_inputs.columnconfigure(1, weight=1)
         
-        self.frame_buttons = ctk.CTkFrame(self)
+        self.frame_buttons = ctk.CTkFrame(self.frame_main)
         self.frame_buttons.pack(side="top", fill="both", expand=False)
         self.frame_buttons.columnconfigure(0, weight=1)
         self.frame_buttons.columnconfigure(1, weight=1)
         
-        self.frame_output = ctk.CTkScrollableFrame(self)
+        self.frame_output = ctk.CTkScrollableFrame(self.frame_main)
         self.frame_output.pack(padx=10, pady=5, fill="both", expand="yes")
+        
+        # History Frame Contents
+        self.lbl_history = ctk.CTkLabel(self.frame_history, text="Roll History")
+        self.lbl_history.pack(padx=10, pady=5, fill="both", expand="no")
+        
+        self.frame_history_contents = ctk.CTkScrollableFrame(self.frame_history)
+        self.frame_history_contents.pack(padx=10, pady=5, fill="both", expand="yes")
         
         # variables to store values
         self.var_btwn = ctk.StringVar(self, value=self.cfg_preset["min"] or "1")
         self.var_and = ctk.StringVar(self, value=self.cfg_preset["max"] or "2")
         self.var_amount = ctk.StringVar(self, value=self.cfg_preset["amount"] or "2")
         self.var_output = ctk.StringVar(self, value="")
+        self.var_history_active = ctk.BooleanVar(self, value=self.cfg_preset["history"] or True)
         
         # track variables
         self.var_btwn.trace_add("write", self.write_number_field)
@@ -88,7 +123,7 @@ class RngGui(ctk.CTk) :
         self.btn_multiple = ctk.CTkButton(self.frame_buttons, text="Roll Multiple", command=self.generate_multiple)
         self.btn_multiple.grid(row=0, column=1, padx=10, pady=8, sticky="WE")
         
-        # Label
+        # Output Label
         self.lbl_output = ctk.CTkLabel(self.frame_output, textvariable=self.var_output, anchor=ctk.N)
         self.lbl_output.pack()
         
@@ -156,6 +191,9 @@ class RngGui(ctk.CTk) :
         # Play tts
         self.sound_player.play_external_sound(output)
         
+        # Record History
+        self.history_handler.record(output, start, end)
+        
         return output
     
     def generate_multiple(self) :
@@ -182,6 +220,9 @@ class RngGui(ctk.CTk) :
         # play sound 
         self.sound_player.play_sound("roll_multiple")
         
+        # Record History
+        self.history_handler.record(formatted_list, start, end)
+        
         # arrange wraplength based on window width
         self.lbl_output.configure(wraplength=self.winfo_width() - 30)
         
@@ -198,6 +239,9 @@ class RngGui(ctk.CTk) :
         # Create and play TTS
         self.sound_player.play_external_sound(random)
         
+        # Record History
+        self.history_handler.record(random, 1, max)
+        
     def hotkey_single(self) :
         self.after(0, self.generate_single)
         
@@ -208,6 +252,18 @@ class RngGui(ctk.CTk) :
         self.config_handler.save_configs()
         self.destroy()
         
+    def enable_disable_history_tab(self) :
+        if self.var_history_active.get() :
+            self.frame_history.forget()
+        else :
+            self.frame_history.pack(side="left", fill="both", expand=True)
+        self.var_history_active.set(not self.var_history_active.get())
+        self.config_handler.preset_config["history"] = self.var_history_active.get()
+        
+        # Resize
+        self.calc_width = self.min_width + self.min_width * self.cfg_preset["history"]
+        self.geometry(f"{self.calc_width}x{self.min_height}")
+            
     def stylize(self, config_handler : ConfigHandler) :
         # create font
         self.label_font = ctk.CTkFont(family=config_handler.style_config["label_font_family"], size=config_handler.style_config["label_font_size"], weight=config_handler.style_config["label_font_weight"])
@@ -219,6 +275,7 @@ class RngGui(ctk.CTk) :
         self.lbl_btwn.configure(font=self.label_font)
         self.lbl_and.configure(font=self.label_font)
         self.lbl_amount.configure(font=self.label_font)
+        self.lbl_history.configure(font=self.label_font)
         
         # Entry Styling
         self.entry_btwn.configure(font=self.entry_font)
@@ -239,6 +296,9 @@ if __name__ == '__main__' :
     # Call the Sound Player Class
     sound_player = SoundPlayer(config_handler=config_handler)
     
+    # Initialize History Handler
+    history_handler = HistoryHandler()
+    
     # Call the GUI class
-    gui = RngGui(config_handler=config_handler, sound_player=sound_player)
+    gui = RngGui(config_handler=config_handler, sound_player=sound_player, history_handler=history_handler)
     gui.mainloop()
