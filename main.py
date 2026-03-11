@@ -5,6 +5,7 @@ from pynput import keyboard
 from config_handler import ConfigHandler
 from sound_player import SoundPlayer
 from history_handler import HistoryHandler
+import datetime
         
 # GUI Class
 class RngGui(ctk.CTk) :
@@ -82,8 +83,15 @@ class RngGui(ctk.CTk) :
         self.lbl_history = ctk.CTkLabel(self.frame_history, text="Roll History")
         self.lbl_history.pack(padx=10, pady=5, fill="both", expand="no")
         
-        self.frame_history_contents = ctk.CTkScrollableFrame(self.frame_history)
-        self.frame_history_contents.pack(padx=10, pady=5, fill="both", expand="yes")
+        self.lbl_history_headers = ctk.CTkLabel(self.frame_history, text="(Numbers, Min, Max, Time - Date)")
+        self.lbl_history_headers.pack(padx=10, fill="both", expand="no")
+        
+        self.scrollbar_history = ctk.CTkScrollbar(self.frame_history)
+        self.scrollbar_history.pack(side="right", fill="both")
+        
+        self.textbox_history = ctk.CTkTextbox(self.frame_history, activate_scrollbars=False, state="disabled", wrap="none")
+        self.textbox_history.pack(padx=10, pady=5, fill="both", expand="yes")
+        self.textbox_history.configure(yscrollcommand=self.scrollbar_history.set)
         
         # variables to store values
         self.var_btwn = ctk.StringVar(self, value=self.cfg_preset["min"] or "1")
@@ -194,6 +202,11 @@ class RngGui(ctk.CTk) :
         # Record History
         self.history_handler.record(output, start, end)
         
+        # Update History GUI
+        self.textbox_history.configure(state="normal")
+        self.textbox_history.insert(index=tk.END, text=f"{output}, {start}, {end}, {datetime.datetime.now().strftime("%X")} - {datetime.datetime.now().strftime("%x")}\n")
+        self.textbox_history.configure(state="disabled")
+        
         return output
     
     def generate_multiple(self) :
@@ -223,6 +236,11 @@ class RngGui(ctk.CTk) :
         # Record History
         self.history_handler.record(formatted_list, start, end)
         
+        # Update History GUI
+        self.textbox_history.configure(state="normal")
+        self.textbox_history.insert(index=tk.END, text=f"{formatted_list}, {start}, {end}, {datetime.datetime.now().strftime("%X")} - {datetime.datetime.now().strftime("%x")}\n")
+        self.textbox_history.configure(state="disabled")
+        
         # arrange wraplength based on window width
         self.lbl_output.configure(wraplength=self.winfo_width() - 30)
         
@@ -241,6 +259,11 @@ class RngGui(ctk.CTk) :
         
         # Record History
         self.history_handler.record(random, 1, max)
+        
+        # Update History GUI
+        self.textbox_history.configure(state="normal")
+        self.textbox_history.insert(index=tk.END, text=f"{random}, {1}, {max}, {datetime.datetime.now().strftime("%X")} - {datetime.datetime.now().strftime("%x")}\n")
+        self.textbox_history.configure(state="disabled")
         
     def hotkey_single(self) :
         self.after(0, self.generate_single)
