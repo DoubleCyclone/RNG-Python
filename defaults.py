@@ -1,4 +1,4 @@
-PRESET = {"min": "1", "max": "2", "amount": "2"}
+PRESET = {"min": "1", "max": "2", "amount": "2", "history" : True}
 
 HOTKEYS = {
     "roll_single": "<alt>+q",
