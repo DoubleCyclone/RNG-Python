@@ -86,12 +86,18 @@ class RngGui(ctk.CTk) :
         self.lbl_history_headers = ctk.CTkLabel(self.frame_history, text="(Numbers, Min, Max, Time - Date)")
         self.lbl_history_headers.pack(padx=10, fill="both", expand="no")
         
-        self.scrollbar_history = ctk.CTkScrollbar(self.frame_history)
-        self.scrollbar_history.pack(side="right", fill="both")
+        self.frame_inner_history = ctk.CTkFrame(self.frame_history)
+        self.frame_inner_history.pack(side="top", fill="both", expand=True)
         
-        self.textbox_history = ctk.CTkTextbox(self.frame_history, activate_scrollbars=False, state="disabled", wrap="none")
+        self.textbox_history = ctk.CTkTextbox(self.frame_inner_history, activate_scrollbars=False, state="disabled", wrap="none")
         self.textbox_history.pack(padx=10, pady=5, fill="both", expand="yes")
-        self.textbox_history.configure(yscrollcommand=self.scrollbar_history.set)
+        
+        self.scrollbar_history_v = ctk.CTkScrollbar(self.frame_inner_history, orientation="vertical", command=self.textbox_history.yview)
+        self.scrollbar_history_v.place(relx=1, rely=0, anchor="ne", relheight=1)
+        self.scrollbar_history_h = ctk.CTkScrollbar(self.frame_inner_history, orientation="horizontal", command=self.textbox_history.xview)
+        self.scrollbar_history_h.place(relx=1, rely=1, anchor="se", relwidth=1)
+        
+        self.textbox_history.configure(yscrollcommand=self.scrollbar_history_v.set, xscrollcommand=self.scrollbar_history_h.set)
         
         # variables to store values
         self.var_btwn = ctk.StringVar(self, value=self.cfg_preset["min"] or "1")
@@ -314,7 +320,7 @@ class RngGui(ctk.CTk) :
         self.lbl_output.configure(font=self.output_font)
         
         # History Textbox Styling
-        self.textbox_history.configure(font=self.button_font)
+        self.textbox_history.configure(font=self.history_font)
                     
 if __name__ == '__main__' :
     # Call the Config Handler Class
