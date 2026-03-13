@@ -33,6 +33,11 @@ jobs:
           --onefile
           --windowed
           --name "RngApp"
+          --hidden-import "history_handler"
+          --hidden-import "config_handler"
+          --hidden-import "sound_player"
+          --hidden-import "utils"
+          --hidden-import "defaults"
           --add-data "resources/sfx/roll_single.wav;resources/sfx"
           --add-data "resources/sfx/roll_multiple.wav;resources/sfx"
           main.py
