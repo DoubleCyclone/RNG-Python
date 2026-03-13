@@ -293,6 +293,7 @@ class RngGui(ctk.CTk) :
         self.entry_font = ctk.CTkFont(family=config_handler.style_config["entry_font_family"], size=config_handler.style_config["entry_font_size"], weight=config_handler.style_config["entry_font_weight"])
         self.button_font = ctk.CTkFont(family=config_handler.style_config["button_font_family"], size=config_handler.style_config["button_font_size"], weight=config_handler.style_config["button_font_weight"])
         self.output_font = ctk.CTkFont(family=config_handler.style_config["output_font_family"], size=config_handler.style_config["output_font_size"], weight=config_handler.style_config["output_font_weight"])
+        self.history_font = ctk.CTkFont(family=config_handler.style_config["history_font_family"], size=config_handler.style_config["history_font_size"], weight=config_handler.style_config["history_font_weight"])
         
         # Label Styling
         self.lbl_btwn.configure(font=self.label_font)
@@ -311,6 +312,9 @@ class RngGui(ctk.CTk) :
         
         # Output Styling
         self.lbl_output.configure(font=self.output_font)
+        
+        # History Textbox Styling
+        self.textbox_history.configure(font=self.button_font)
                     
 if __name__ == '__main__' :
     # Call the Config Handler Class

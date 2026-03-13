@@ -29,6 +29,9 @@ STYLE = {
     "output_font_family": "Roboto",
     "output_font_size": 64,
     "output_font_weight": "normal",
+    "history_font_family": "Roboto",
+    "history_font_size": 16,
+    "history_font_weight": "normal",
 }
 
 SFX = {
