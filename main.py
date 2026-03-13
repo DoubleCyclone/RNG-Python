@@ -248,7 +248,8 @@ class RngGui(ctk.CTk) :
         self.textbox_history.configure(state="disabled")
         
         # arrange wraplength based on window width
-        self.lbl_output.configure(wraplength=self.winfo_width() - 30)
+        width = self.frame_output.winfo_width()
+        self.lbl_output.configure(wraplength=width)
         
     def roll_predetermined(self, max) :
         # Roll
