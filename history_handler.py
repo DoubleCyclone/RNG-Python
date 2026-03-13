@@ -28,7 +28,7 @@ class HistoryHandler() :
         
         with open(self.csv_path, mode="a", newline='') as csvfile:
             writer = csv.writer(csvfile)
-            writer.writerow([numbers, min, max, f"{datetime.datetime.now().strftime("%X")} - {datetime.datetime.now().strftime("%x")}"])
+            writer.writerow([numbers, min, max, f"{datetime.datetime.now().strftime('%X')} - {datetime.datetime.now().strftime('%x')}"])
         
         
         
