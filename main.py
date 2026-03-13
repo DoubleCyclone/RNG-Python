@@ -210,7 +210,7 @@ class RngGui(ctk.CTk) :
         
         # Update History GUI
         self.textbox_history.configure(state="normal")
-        self.textbox_history.insert(index=tk.END, text=f"{output}, {start}, {end}, {datetime.datetime.now().strftime("%X")} - {datetime.datetime.now().strftime("%x")}\n")
+        self.textbox_history.insert(index=tk.END, text=f"{output}, {start}, {end}, {datetime.datetime.now().strftime('%X')} - {datetime.datetime.now().strftime('%x')}\n")
         self.textbox_history.configure(state="disabled")
         
         return output
@@ -244,7 +244,7 @@ class RngGui(ctk.CTk) :
         
         # Update History GUI
         self.textbox_history.configure(state="normal")
-        self.textbox_history.insert(index=tk.END, text=f"{formatted_list}, {start}, {end}, {datetime.datetime.now().strftime("%X")} - {datetime.datetime.now().strftime("%x")}\n")
+        self.textbox_history.insert(index=tk.END, text=f"{formatted_list}, {start}, {end}, {datetime.datetime.now().strftime('%X')} - {datetime.datetime.now().strftime('%x')}\n")
         self.textbox_history.configure(state="disabled")
         
         # arrange wraplength based on window width
@@ -269,7 +269,7 @@ class RngGui(ctk.CTk) :
         
         # Update History GUI
         self.textbox_history.configure(state="normal")
-        self.textbox_history.insert(index=tk.END, text=f"{random}, {1}, {max}, {datetime.datetime.now().strftime("%X")} - {datetime.datetime.now().strftime("%x")}\n")
+        self.textbox_history.insert(index=tk.END, text=f"{random}, {1}, {max}, {datetime.datetime.now().strftime('%X')} - {datetime.datetime.now().strftime('%x')}\n")
         self.textbox_history.configure(state="disabled")
         
     def hotkey_single(self) :
