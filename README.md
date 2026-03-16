@@ -1,5 +1,4 @@
-# RNG-Python
-Random number generator with Python Tkinter
+# Random Number Generator by 8-Bit Hero
 
 ## 📋 Table of Contents
 - [Overview](#-overview)
