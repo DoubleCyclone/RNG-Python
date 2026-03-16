@@ -1,17 +1,17 @@
 PRESET = {"min": "1", "max": "2", "amount": "2", "history" : True}
 
 HOTKEYS = {
-    "roll_single": "<alt>+q",
-    "roll_multiple": "<alt>+w",
-    "roll_d10": "<alt>+1",
-    "roll_d2": "<alt>+2",
-    "roll_d3": "<alt>+3",
-    "roll_d4": "<alt>+4",
-    "roll_d5": "<alt>+5",
-    "roll_d6": "<alt>+6",
-    "roll_d7": "<alt>+7",
-    "roll_d8": "<alt>+8",
-    "roll_d9": "<alt>+9",
+    "roll_single": "<shift>+q",
+    "roll_multiple": "<shift>+w",
+    "roll_d10": "<shift>+1",
+    "roll_d2": "<shift>+2",
+    "roll_d3": "<shift>+3",
+    "roll_d4": "<shift>+4",
+    "roll_d5": "<shift>+5",
+    "roll_d6": "<shift>+6",
+    "roll_d7": "<shift>+7",
+    "roll_d8": "<shift>+8",
+    "roll_d9": "<shift>+9",
 }
 
 STYLE = {

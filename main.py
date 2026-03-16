@@ -177,7 +177,7 @@ class RngGui(ctk.CTk) :
             if self.var_and.get().find("-", 1) >= 0 :
                 self.var_and.set(self.var_and.get()[0] + self.var_and.get()[1:].replace("-", ""))
         elif var == str(self.var_amount) :
-            self.var_amount.set(''.join([x for x in self.var_amount.get() if x in valid_inputs[2:]]))
+            self.var_amount.set(''.join([x for x in self.var_amount.get() if x in valid_inputs[1:]]))
             
         # Save
         self.config_handler.preset_config["min"] = self.var_btwn.get()
@@ -213,13 +213,15 @@ class RngGui(ctk.CTk) :
         self.textbox_history.insert(index=tk.END, text=f"{output}, {start}, {end}, {datetime.datetime.now().strftime('%X')} - {datetime.datetime.now().strftime('%x')}\n")
         self.textbox_history.configure(state="disabled")
         
+        self.textbox_history.yview_moveto(1.0)
+        
         return output
     
     def generate_multiple(self) :
         # get values from fields
         start = int(self.var_btwn.get() or "0")
         end = int(self.var_and.get() or "0")
-        amount = int(self.var_amount.get() or "1")
+        amount = 1 if self.var_amount.get() in ["", "0"] else int(self.var_amount.get())
         
         # Swap if min > max
         if start > end :
@@ -247,6 +249,8 @@ class RngGui(ctk.CTk) :
         self.textbox_history.insert(index=tk.END, text=f"{formatted_list}, {start}, {end}, {datetime.datetime.now().strftime('%X')} - {datetime.datetime.now().strftime('%x')}\n")
         self.textbox_history.configure(state="disabled")
         
+        self.textbox_history.yview_moveto(1.0)
+        
         # arrange wraplength based on window width
         width = self.frame_output.winfo_width()
         self.lbl_output.configure(wraplength=width)
@@ -272,6 +276,8 @@ class RngGui(ctk.CTk) :
         self.textbox_history.insert(index=tk.END, text=f"{random}, {1}, {max}, {datetime.datetime.now().strftime('%X')} - {datetime.datetime.now().strftime('%x')}\n")
         self.textbox_history.configure(state="disabled")
         
+        self.textbox_history.yview_moveto(1.0)
+        
     def hotkey_single(self) :
         self.after(0, self.generate_single)
         
@@ -293,6 +299,7 @@ class RngGui(ctk.CTk) :
         # Resize
         self.calc_width = self.min_width + self.min_width * self.cfg_preset["history"]
         self.geometry(f"{self.calc_width}x{self.min_height}")
+        print(self.calc_width)
             
     def stylize(self, config_handler : ConfigHandler) :
         # create font
