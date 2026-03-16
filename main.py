@@ -32,17 +32,24 @@ class RngGui(ctk.CTk) :
         self.calc_width = self.min_width + self.min_width * self.cfg_preset["history"]
         
         # Full Container
-        self.frame_container = ctk.CTkFrame(self, width=self.min_width, height=self.min_height)
-        self.frame_container.pack(side="top", fill="both", expand=True)
+        self.frame_container = ctk.CTkFrame(self)
+        self.frame_container.pack(fill="both", expand=True)
+        
+        # Column 0 (main) — fixed min width, but can still expand
+        self.frame_container.columnconfigure(0, minsize=self.min_width, weight=1)
+        # Column 1 (history) — only expands when visible
+        self.frame_container.columnconfigure(1, minsize=self.min_width, weight=1)
+        
         
         # Main Frame
         self.frame_main = ctk.CTkFrame(self.frame_container, width=self.min_width, height=self.min_height)
-        self.frame_main.pack(side="left", fill="both", expand=True)
-        
+        self.frame_main.grid(row=0, column=0, sticky="nsew")
         # History Frame
         self.frame_history = ctk.CTkFrame(self.frame_container, width=self.min_width)
-        self.frame_history.pack(side="left", fill="both", expand=True)
-        
+        self.frame_history.grid(row=0, column=1, sticky="nsew")
+       
+        self.frame_container.rowconfigure(0, weight=1)
+                
         # Root Window
         self.title("Random Number Generator by 8-Bit Hero")
         self.geometry(f"{self.calc_width}x{self.min_height}")
@@ -104,7 +111,7 @@ class RngGui(ctk.CTk) :
         self.var_and = ctk.StringVar(self, value=self.cfg_preset["max"] or "2")
         self.var_amount = ctk.StringVar(self, value=self.cfg_preset["amount"] or "2")
         self.var_output = ctk.StringVar(self, value="")
-        self.var_history_active = ctk.BooleanVar(self, value=self.cfg_preset["history"] or True)
+        self.var_history_active = ctk.BooleanVar(self, value=self.cfg_preset.get("history", True))
         
         # track variables
         self.var_btwn.trace_add("write", self.write_number_field)
@@ -209,8 +216,9 @@ class RngGui(ctk.CTk) :
         self.history_handler.record(output, start, end)
         
         # Update History GUI
+        now = datetime.datetime.now()
         self.textbox_history.configure(state="normal")
-        self.textbox_history.insert(index=tk.END, text=f"{output}, {start}, {end}, {datetime.datetime.now().strftime('%X')} - {datetime.datetime.now().strftime('%x')}\n")
+        self.textbox_history.insert(index=tk.END, text=f"{output}, {start}, {end}, {now.strftime('%X')} - {now.strftime('%x')}\n")
         self.textbox_history.configure(state="disabled")
         
         self.textbox_history.yview_moveto(1.0)
@@ -245,8 +253,9 @@ class RngGui(ctk.CTk) :
         self.history_handler.record(formatted_list, start, end)
         
         # Update History GUI
+        now = datetime.datetime.now()
         self.textbox_history.configure(state="normal")
-        self.textbox_history.insert(index=tk.END, text=f"{formatted_list}, {start}, {end}, {datetime.datetime.now().strftime('%X')} - {datetime.datetime.now().strftime('%x')}\n")
+        self.textbox_history.insert(index=tk.END, text=f"{formatted_list}, {start}, {end}, {now.strftime('%X')} - {now.strftime('%x')}\n")
         self.textbox_history.configure(state="disabled")
         
         self.textbox_history.yview_moveto(1.0)
@@ -272,8 +281,9 @@ class RngGui(ctk.CTk) :
         self.history_handler.record(random, 1, max)
         
         # Update History GUI
+        now = datetime.datetime.now()
         self.textbox_history.configure(state="normal")
-        self.textbox_history.insert(index=tk.END, text=f"{random}, {1}, {max}, {datetime.datetime.now().strftime('%X')} - {datetime.datetime.now().strftime('%x')}\n")
+        self.textbox_history.insert(index=tk.END, text=f"{random}, {1}, {max}, {now.strftime('%X')} - {now.strftime('%x')}\n")
         self.textbox_history.configure(state="disabled")
         
         self.textbox_history.yview_moveto(1.0)
@@ -288,18 +298,22 @@ class RngGui(ctk.CTk) :
         self.config_handler.save_configs()
         self.destroy()
         
-    def enable_disable_history_tab(self) :
-        if self.var_history_active.get() :
-            self.frame_history.forget()
-        else :
-            self.frame_history.pack(side="left", fill="both", expand=True)
-        self.var_history_active.set(not self.var_history_active.get())
-        self.config_handler.preset_config["history"] = self.var_history_active.get()
-        
-        # Resize
-        self.calc_width = self.min_width + self.min_width * self.cfg_preset["history"]
-        self.geometry(f"{self.calc_width}x{self.min_height}")
-        print(self.calc_width)
+    def enable_disable_history_tab(self):
+        history_on = not self.var_history_active.get()
+
+        if history_on:
+            self.frame_history.grid(row=0, column=1, sticky="nsew")
+            self.frame_container.columnconfigure(1, minsize=self.min_width, weight=1)
+        else:
+            self.frame_history.grid_remove()  # remembers grid settings for when you re-add it
+            self.frame_container.columnconfigure(1, minsize=0, weight=0)
+
+        self.var_history_active.set(history_on)
+        self.config_handler.preset_config["history"] = history_on
+
+        new_width = self.min_width + self.min_width * int(history_on)
+        self.minsize(new_width, self.min_height)
+        self.geometry(f"{new_width}x{self.min_height}")
             
     def stylize(self, config_handler : ConfigHandler) :
         # create font
