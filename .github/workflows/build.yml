@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
@@ -20,6 +20,14 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+
+      - name: Install system libraries for pygame/tk/tts
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libsdl2-dev libsdl2-mixer-dev libsdl2-image-dev libsdl2-ttf-dev \
+            python3-tk \
+            espeak-ng
 
       - name: Install dependencies
         run: |
@@ -33,13 +41,16 @@ jobs:
           --onefile
           --windowed
           --name "RngApp"
-          --add-data "resources/sfx/roll_single.wav;resources/sfx"
-          --add-data "resources/sfx/roll_multiple.wav;resources/sfx"
+          --add-data "resources/sfx/roll_single.wav:resources/sfx"
+          --add-data "resources/sfx/roll_multiple.wav:resources/sfx"
           main.py
 
       # Zip the output folder so it can be attached to the release as one file
       - name: Zip build output
-        run: Compress-Archive -Path dist/RngApp.exe -DestinationPath RngApp.zip
+        run: |
+          cd dist
+          zip ../RngApp-linux.zip RngApp
+          cd ..
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -47,6 +58,6 @@ jobs:
           tag_name: ${{ github.ref_name }}
           name: ${{ github.ref_name }}
           body: "Automated build from ${{ github.ref_name }}"
-          files: RngApp.zip
+          files: RngApp-linux.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
