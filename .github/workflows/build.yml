@@ -43,6 +43,7 @@ jobs:
           --name "RngApp"
           --hidden-import "pynput.keyboard._xorg"
           --hidden-import "pynput.mouse._xorg"
+          --collect-data customtkinter
           --add-data "resources/sfx/roll_single.wav:resources/sfx"
           --add-data "resources/sfx/roll_multiple.wav:resources/sfx"
           main.py
