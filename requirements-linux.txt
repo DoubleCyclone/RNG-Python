@@ -9,7 +9,7 @@ click==8.1.8
 customtkinter==5.2.2
 darkdetect==0.8.0
 Eel==0.18.2
-evdev==2.0.0
+evdev==2.0.0; sys_platform == "linux"
 future==1.0.0
 gevent==25.9.1
 gevent-websocket==0.10.1
